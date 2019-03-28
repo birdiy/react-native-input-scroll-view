@@ -72,14 +72,16 @@ export default class extends PureComponent {
             PropTypes.number,
         ]),
         useAnimatedScrollView: PropTypes.bool,
-        keyboardAvoidingViewProps: PropTypes.object
+        keyboardAvoidingViewProps: PropTypes.object,
+        innerRef: PropTypes.func
     };
 
     static defaultProps = {
         keyboardOffset: 40,
         multilineInputStyle: null,
         useAnimatedScrollView: false,
-        keyboardAvoidingViewProps: null
+        keyboardAvoidingViewProps: null,
+        innerRef: () => {}
     };
 
     state = {
@@ -258,7 +260,7 @@ export default class extends PureComponent {
     }, 3);
 
     _onRef = root => {
-        const { useAnimatedScrollView } = this.props;
+        const { useAnimatedScrollView, innerRef } = this.props;
         if (!root) return;
         this._root = root;
 
@@ -273,6 +275,8 @@ export default class extends PureComponent {
                 this._topOffset = y;
             });
         };
+
+        innerRef(root);
 
         setTimeout(getTopOffset);
         // 如果屏幕是带动画进入，那么初次获取的位置偏移量并不准确，需要等动画听指挥重新计算
