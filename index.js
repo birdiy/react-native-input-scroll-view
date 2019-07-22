@@ -272,16 +272,15 @@ export default class extends PureComponent {
             this.props.topOffset === undefined &&
             this._root._innerViewRef &&
             this._root._innerViewRef.measureInWindow((x, y) => {
-                this._topOffset = y;
+                if (y > 0) this._topOffset = y;
             });
         };
 
         innerRef(root);
 
         setTimeout(getTopOffset);
-        // 如果屏幕是带动画进入，那么初次获取的位置偏移量并不准确，需要等动画听指挥重新计算
-        // 这里暂定等待时间为 1000 毫秒
-        setTimeout(getTopOffset, 1000);
+        // 如果屏幕是带动画进入，那么初次获取的位置偏移量并不准确
+        // 这时最好通过 topOffset 属性来手动设定 topBar 的偏移量
     };
 
     _scrollToKeyboardRequest = () => {
@@ -458,9 +457,12 @@ function focus(targetTag) {
         // 在 react-native v0.57 版本中（也可能更早），UIManager.focus 不再有效
         TextInput.State && TextInput.State.focusTextInput(targetTag);
     } else {
+        const AndroidTextInput = UIManager.getViewManagerConfig 
+            && UIManager.getViewManagerConfig('AndroidTextInput')
+            || UIManager.AndroidTextInput;
         UIManager.dispatchViewManagerCommand(
             targetTag,
-            UIManager.AndroidTextInput.Commands.focusTextInput,
+            AndroidTextInput.Commands.focusTextInput,
             null,
         );
     }
